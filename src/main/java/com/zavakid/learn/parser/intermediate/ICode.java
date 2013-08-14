@@ -1,5 +1,5 @@
 package com.zavakid.learn.parser.intermediate;
 
-public class ICode {
+public interface ICode {
 
 }
