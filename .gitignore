@@ -4,3 +4,16 @@
 *.jar
 *.war
 *.ear
+
+# for eclipse
+.classpath
+.project
+.settings/
+target
+
+
+1.txt
+2.txt
+
+*.~
+*.bak
