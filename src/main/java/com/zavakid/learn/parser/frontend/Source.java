@@ -1,59 +1,69 @@
 package com.zavakid.learn.parser.frontend;
 
+import static com.zavakid.learn.parser.message.MessageType.SOURCE_LINE;
+
 import java.io.BufferedReader;
 import java.io.IOException;
+
+import com.zavakid.learn.parser.message.Message;
+import com.zavakid.learn.parser.message.MessageHandler;
+import com.zavakid.learn.parser.message.MessageListener;
+import com.zavakid.learn.parser.message.MessageProducer;
 
 /**
  * The framework class that represents the source program.
  */
-public class Source {
-    public static final char EOL ='\n';   // end-of-line character
-    public static final char EOF =(char)0; // end-of-file character
+public class Source implements MessageProducer {
+    public static final char        EOL            = '\n';                // end-of-line character
+    public static final char        EOF            = (char) 0;            // end-of-file character
 
-    private BufferedReader   reader;      // reader for the source program
-    private String           line;        // source line
-    private int              lineNum;     // current source line number
-    private int              currentPos;  // current source line position
+    // message handler delegate
+    protected static MessageHandler messageHandler = new MessageHandler();
+
+    private BufferedReader          reader;                               // reader for the source
+                                                                           // program
+    private String                  line;                                 // source line
+    private int                     lineNum;                              // current source line
+                                                                           // number
+    private int                     currentPos;                           // current source line
+                                                                           // position
 
     /**
      * Constructor.
      * 
-     * @param reader
-     *            the reader for the source program
-     * @throws IOException
-     *             if an I/O error occurred
+     * @param reader the reader for the source program
+     * @throws IOException if an I/O error occurred
      */
     public Source(BufferedReader reader) throws IOException {
-        this.lineNum =0;
+        this.lineNum = 0;
         this.currentPos = -2; // set to -2 to read the first source line
-        this.reader =reader;
+        this.reader = reader;
     }
 
     /**
      * Return the source character at the current position.
      * 
      * @return the source character at the current position.
-     * @throws Exception
-     *             if an error occurred.
+     * @throws Exception if an error occurred.
      */
     public char currentChar() throws Exception {
         // First time?
-        if(currentPos == -2) {
+        if (currentPos == -2) {
             readLine();
             return nextChar();
         }
 
         // At end of file?
-        else if(line ==null) {
+        else if (line == null) {
             return EOF;
         }
         // At end of line?
-        else if((currentPos == -1) ||(currentPos ==line.length())) {
+        else if ((currentPos == -1) || (currentPos == line.length())) {
             return EOL;
         }
 
         // Need to read the next line?
-        else if(currentPos >line.length()) {
+        else if (currentPos > line.length()) {
             readLine();
             return nextChar();
         }
@@ -68,8 +78,7 @@ public class Source {
      * Consume the current source character and return the next character.
      * 
      * @return the next source character.
-     * @throws Exception
-     *             if an error occurred.
+     * @throws Exception if an error occurred.
      */
     public char nextChar() throws Exception {
         ++currentPos;
@@ -81,44 +90,47 @@ public class Source {
      * consuming the current character.
      * 
      * @return the following character.
-     * @throws Exception
-     *             if an error occurred.
+     * @throws Exception if an error occurred.
      */
     public char peekChar() throws Exception {
         currentChar();
-        if(line ==null) {
+        if (line == null) {
             return EOF;
         }
-        int nextPos =currentPos +1;
-        return nextPos <line.length()?line.charAt(nextPos): EOL;
+        int nextPos = currentPos + 1;
+        return nextPos < line.length() ? line.charAt(nextPos) : EOL;
     }
 
     /**
      * Read the next source line.
      * 
-     * @throws IOException
-     *             if an I/O error occurred.
+     * @throws IOException if an I/O error occurred.
      */
     private void readLine() throws IOException {
-        line =reader.readLine(); // null when at the end of the source
+        line = reader.readLine(); // null when at the end of the source
         currentPos = -1;
 
-        if(line !=null) {
+        if (line != null) {
             ++lineNum;
+        }
+
+        // Send a source line message containing the line number
+        // and the line text to all the listeners.
+        if (line != null) {
+            sendMessage(new Message(SOURCE_LINE, new Object[] { lineNum, line }));
         }
     }
 
     /**
      * Close the source.
      * 
-     * @throws Exception
-     *             if an error occurred.
+     * @throws Exception if an error occurred.
      */
     public void close() throws Exception {
-        if(reader !=null) {
+        if (reader != null) {
             try {
                 reader.close();
-            } catch(IOException ex) {
+            } catch (IOException ex) {
                 ex.printStackTrace();
                 throw ex;
             }
@@ -140,4 +152,32 @@ public class Source {
     public int getPosition() {
         return getCurrentPos();
     }
+
+    /**
+     * Add a parser message listener.
+     * 
+     * @param listener the message listener to add.
+     */
+    public void addMessageListener(MessageListener listener) {
+        messageHandler.addListener(listener);
+    }
+
+    /**
+     * Remove a parser message listener.
+     * 
+     * @param listener the message listener to remove.
+     */
+    public void removeMessageListener(MessageListener listener) {
+        messageHandler.removeListener(listener);
+    }
+
+    /**
+     * Notify listeners after setting the message.
+     * 
+     * @param message the message to set.
+     */
+    public void sendMessage(Message message) {
+        messageHandler.sendMessage(message);
+    }
+
 }
