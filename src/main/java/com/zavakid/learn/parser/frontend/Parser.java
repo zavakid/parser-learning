@@ -2,6 +2,8 @@ package com.zavakid.learn.parser.frontend;
 
 import com.zavakid.learn.parser.intermediate.ICode;
 import com.zavakid.learn.parser.intermediate.SymTab;
+import com.zavakid.learn.parser.intermediate.SymTabFactory;
+import com.zavakid.learn.parser.intermediate.SymTabStack;
 import com.zavakid.learn.parser.message.Message;
 import com.zavakid.learn.parser.message.MessageHandler;
 import com.zavakid.learn.parser.message.MessageListener;
@@ -12,6 +14,9 @@ import com.zavakid.learn.parser.message.MessageProducer;
  * implemented by language-specific subclasses.
  */
 public abstract class Parser implements MessageProducer {
+
+    // symbol table stack
+    protected static SymTabStack    symTabStack    = SymTabFactory.createSymTabStack();
 
     // generated symbol table
     protected static SymTab         symTab         = null;
