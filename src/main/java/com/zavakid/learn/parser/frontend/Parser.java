@@ -1,7 +1,6 @@
 package com.zavakid.learn.parser.frontend;
 
 import com.zavakid.learn.parser.intermediate.ICode;
-import com.zavakid.learn.parser.intermediate.SymTab;
 import com.zavakid.learn.parser.intermediate.SymTabFactory;
 import com.zavakid.learn.parser.intermediate.SymTabStack;
 import com.zavakid.learn.parser.message.Message;
@@ -18,8 +17,6 @@ public abstract class Parser implements MessageProducer {
     // symbol table stack
     protected static SymTabStack    symTabStack    = SymTabFactory.createSymTabStack();
 
-    // generated symbol table
-    protected static SymTab         symTab         = null;
     // message handler delegate
     protected static MessageHandler messageHandler = new MessageHandler();
 
@@ -95,8 +92,8 @@ public abstract class Parser implements MessageProducer {
         messageHandler.sendMessage(message);
     }
 
-    public static SymTab getSymTab() {
-        return symTab;
+    public static SymTabStack getSymTabStack() {
+        return symTabStack;
     }
 
     public ICode getICode() {

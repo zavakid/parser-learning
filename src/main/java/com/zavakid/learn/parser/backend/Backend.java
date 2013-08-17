@@ -1,7 +1,7 @@
 package com.zavakid.learn.parser.backend;
 
 import com.zavakid.learn.parser.intermediate.ICode;
-import com.zavakid.learn.parser.intermediate.SymTab;
+import com.zavakid.learn.parser.intermediate.SymTabStack;
 import com.zavakid.learn.parser.message.Message;
 import com.zavakid.learn.parser.message.MessageHandler;
 import com.zavakid.learn.parser.message.MessageListener;
@@ -12,7 +12,7 @@ public abstract class Backend implements MessageProducer {
     // Message handler delegate.
     protected static MessageHandler messageHandler = new MessageHandler();
 
-    protected SymTab                symTab;                               // symbol table
+    protected SymTabStack           symTabStack;
     protected ICode                 iCode;                                // intermediate code
 
     /**
@@ -23,7 +23,7 @@ public abstract class Backend implements MessageProducer {
      * @param symTab the symbol table.
      * @throws Exception if an error occurred.
      */
-    public abstract void process(ICode iCode, SymTab symTab) throws Exception;
+    public abstract void process(ICode iCode, SymTabStack symTabStack) throws Exception;
 
     public void addMessageListener(MessageListener listener) {
         messageHandler.addListener(listener);

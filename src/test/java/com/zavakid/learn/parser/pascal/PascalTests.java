@@ -17,8 +17,13 @@ public class PascalTests {
         doParse("compile", file);
     }
 
-    private void doParse(String op, String helloPascal) {
-        String[] args = new String[] { op, helloPascal };
+    @Test
+    public void testPascal_3() {
+        String file = PascalTests.class.getResource("/pascal/newton.pas").getFile().toString();
+        doParse("compile", "-x", file);
+    }
+
+    private void doParse(String... args) {
         Pascal.main(args);
     }
 }

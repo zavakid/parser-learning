@@ -13,9 +13,11 @@ import com.zavakid.learn.parser.frontend.Source;
 import com.zavakid.learn.parser.frontend.TokenType;
 import com.zavakid.learn.parser.intermediate.ICode;
 import com.zavakid.learn.parser.intermediate.SymTab;
+import com.zavakid.learn.parser.intermediate.SymTabStack;
 import com.zavakid.learn.parser.message.Message;
 import com.zavakid.learn.parser.message.MessageListener;
 import com.zavakid.learn.parser.message.MessageType;
+import com.zavakid.learn.parser.util.CrossReferencer;
 
 public class Pascal {
 
@@ -43,6 +45,7 @@ public class Pascal {
     private Source              source;                                                                                // language-independent scanner
     private ICode               iCode;                                                                                 // generated intermediate code
     private SymTab              symTab;                                                                                // generated symbol table
+    private SymTabStack         symTabStack;                                                                           // symbol table stack
     private Backend             backend;                                                                               // backend
 
     /**
@@ -104,9 +107,14 @@ public class Pascal {
             source.close();
 
             iCode = parser.getICode();
-            symTab = parser.getSymTab();
+            symTabStack = parser.getSymTabStack();
 
-            backend.process(iCode, symTab);
+            if (xref) {
+                CrossReferencer crossReferencer = new CrossReferencer();
+                crossReferencer.print(symTabStack);
+            }
+
+            backend.process(iCode, symTabStack);
         } catch (Exception ex) {
             System.out.println("***** Internal translator error. *****");
             ex.printStackTrace();
